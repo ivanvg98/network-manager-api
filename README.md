@@ -21,7 +21,7 @@ Contraseña: root
  >***Se puede cambiar los ajustes en App.py de la linea 15 y 16***
 
 
-Para instalar la base de datos del archivo .sql, estando en la consola de mysql ejecutar:
+Para instalar la base de datos estando en la consola de mysql ejecutar:
 
 ```
 source DIRECCION_DEL_ARCHIVO/usersdb.sql
@@ -29,9 +29,17 @@ source DIRECCION_DEL_ARCHIVO/usersdb.sql
 
 ## Aplicación
 
-La base de datos viene con un usuario por defecto de tipo administrador, con las que se puede ingresar en la aplicación web
+La base de datos viene con un usuario por defecto de tipo administrador, con la que se puede ingresar a la aplicación web
 
 ```
 Usuario: admin
 Contraseña: admin
 ```
+
+Para ejecutar la aplicación, estando en la carpeta del proyecto:
+
+```
+export FLASK_APP=App
+flask run
+```
+> Para habilitar el depurador ejecutar ***export FLASK_ENV=development***
