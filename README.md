@@ -1,5 +1,4 @@
 # networkManager
-Proyecto redes 3
 
 ## Dependencias
 
