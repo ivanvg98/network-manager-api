@@ -1,0 +1,43 @@
+<div class="d-flex align-items-center p-3 my-3 text-white bg-blue rounded shadow-sm">
+    <span class="material-icons md-36 pe-3">account_circle</span>
+    <div class="lh-1">
+        <h1 class="h5 mb-0 text-white lh-2">  Usuarios</h1>
+    </div>
+</div>
+<div class="my-3 p-3 bg-body rounded shadow-sm">
+    <table class="table table-hover">
+        <thead>
+            <tr class="bg-table text-white">
+                <th>Nombre</th>
+                <th>Username</th>
+                <th>Email</th>
+                <th>Contraseña</th>
+                <th>Tipo de cuenta</th>
+                {% if type == 1 %} <th>Acciones</th> {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+            <tr>
+                <td>{{user.name}} {{user.last_name}}</td>
+                <td>{{user.user_name}}</td>
+                <td>{{user.email}}</td>
+                <td>{{user.password}}</td>
+                <td>{{ "Administrador" if user.admin == 1 else "Estándar" }}  </td>
+                {% if type == 1 %}
+                <td id={{user.user_name}}>
+                    <a href="{{ url_for('edit_template', user_name = user.user_name) }}" class="edit"
+                        data-toggle="modal">
+                        <i class="material-icons icon-blue" data-toggle="tooltip" title="Edit">edit</i></a>
+                    <a href="#" class="delete" data-toggle="modal" onclick="deleteUser('{{user.user_name}}')"><i
+                            class="material-icons icon-blue" data-toggle="tooltip" title="Delete">delete</i></a>
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    <small class="d-block text-end mt-3">
+        <a class="btn bg-btn" href="{{url_for('new_user')}}">Nuevo usuario</a>
+    </small>
+</div>

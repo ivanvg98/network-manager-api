@@ -1,0 +1,55 @@
+<!-- Plantilla usando offcanvas-navbar de bootstrap -->
+{% extends 'base.html' %}
+{% block header %}
+<!-- Hoja de estilo del login -->
+<link href="{{ url_for('static', filename='menu.css') }}" rel="stylesheet">
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+<script type="text/javascript" src="{{ url_for('static', filename='js/jquery-3.6.0.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/nav.js') }}"></script>
+<script type="text/javascript" src="{{ url_for('static', filename='js/menu.js') }}"></script>
+{% endblock %}
+
+{% block title %}Administración{% endblock %}
+
+{% block content %}
+
+<body>
+    <header class="p-3 bg-nav text-white">
+        <div class="container">
+            <div class="d-flex flex-wrap align-items-center justify-content-center justify-content-lg-start">
+                <ul class="nav col-12 col-lg-auto me-lg-auto mb-2 justify-content-center mb-md-0">
+                    <li><a href="#" class="nav-link px-1 text-white" onclick="loadTemplate('/home')"><h5>Inicio</h5></a></li>
+                    <li><a href="#users" class="nav-link px-4 text-white" onclick="loadTemplate('/users')"><h5>Usuarios</h5></a></li>
+                    <li><a href="#devices" class="nav-link px-4 text-white" onclick="loadTemplate('/devices')"><h5>Dispositivos</h5></a></li>
+                    <li><a href="#protocols" class="nav-link px-4 text-white" onclick="loadTemplate('/protocols')"><h5>Protocolos</h5></a>
+                    </li>
+                </ul>
+
+                <div class="text-end">
+                    <div class="dropdown mt-2">
+                        <button class="btn dropdown-toggle d-flex align-items-center bg-btn" type="button" id="dropdownMenuButton1"
+                            data-bs-toggle="dropdown" aria-expanded="false">
+                            <span class="material-icons md-36 pe-2">account_circle</span>
+                            <div class="lh-1">
+                                <h1 class="h6 mb-0 text-white lh-2 pe-2">Cuenta</h1>
+                            </div>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-dark bg-nav" aria-labelledby="dropdownMenuButton1">
+                            <li><a class="dropdown-item"
+                                    href="{{url_for('password_template', user_name = user_name)}}">Cambiar
+                                    contraseña</a>
+                            </li>
+                            <li><a class="dropdown-item" href="{{url_for('logout')}}">Cerrar sesión</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="container" id="nav-placeholder">
+
+    </main>
+</body>
+{% endblock %}

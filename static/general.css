@@ -1,0 +1,34 @@
+.material-icons.md-18 { font-size: 18px; }
+.material-icons.md-24 { font-size: 24px; }
+.material-icons.md-36 { font-size: 36px; }
+.material-icons.md-48 { font-size: 48px; }
+i.icon-blue { color: #3282B8; }
+
+.bg-btn { 
+    background-color: #3282B8 !important;
+    color: white !important;
+}
+
+.bg-nav { background-color: #1B262C !important; }
+.bg-blue { background-color: #3282B8 !important; }
+.bg-indigo { background-color: #3E206D; }
+.bg-purple { background-color: #916DD5; }
+.bg-pink { background-color: #d63384; }
+.bg-red { background-color: #dc3545; }
+.bg-orange { background-color: #fd7e14; }
+.bg-yellow { background-color: #ffc107; }
+.bg-green { background-color: #198754; }
+.bg-teal { background-color: #20c997; }
+.bg-cyan { background-color: #0dcaf0; }
+
+.link {
+    color: #3282B8 !important;
+}
+
+.bg-table {
+    background-color: #3282B8 !important;
+}
+
+.bg-edit {
+    background-color: #D6E6F2 !important;
+}

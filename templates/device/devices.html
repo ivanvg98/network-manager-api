@@ -1,0 +1,48 @@
+<div class="d-flex align-items-center p-3 my-3 text-white bg-blue rounded shadow-sm">
+    <span class="material-icons md-36 pe-3">router</span>
+    <div class="lh-1">
+        <h1 class="h5 mb-0 text-white lh-1">Dispositivos</h1>
+    </div>
+</div>
+<div class="my-3 p-3 bg-body rounded shadow-sm">
+    <table class="table table-hover">
+        <thead>
+            <tr class="bg-table text-white">
+                <th>Nombre</th>
+                <th>Dirección loopback</th>
+                <th>Enrutamiento</th>
+                {% if type == 1 %} <th>Acciones</th> {% endif %}
+            </tr>
+        </thead>
+        <tbody>
+            {% for device in devices %}
+            <tr>
+                <td>{{device.device_name}}</td>
+                <td>{{device.loopback}}</td>
+                <td>
+                    {% if device.routing_type == '0' %} Ninguno {% endif %}
+
+                    {% if device.routing_type == '1' %} RIP {% endif %}
+
+                    {% if device.routing_type == '2' %} OSPF {% endif %}
+
+                    {% if device.routing_type == '3' %} IGRP {% endif %}
+                </td>
+                {% if type == 1 %}
+                <td>
+                    <a href="{{ url_for('edit_device_template', device_name = device.device_name) }}" class="edit"
+                        data-toggle="modal"><i class="material-icons icon-blue" data-toggle="tooltip"
+                            title="Edit">edit</i></a>
+                    <a href="#" class="delete" data-toggle="modal" onclick="deleteDevice('{{device.device_name}}')"><i
+                            class="material-icons icon-blue" data-toggle="tooltip" title="Delete">delete</i></a>
+                </td>
+                {% endif %}
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+    
+    <small class="d-block text-end mt-3">
+        <a class="btn bg-btn" href="{{url_for('new_device')}}">Nuevo dispositivo</a>
+    </small>
+</div>

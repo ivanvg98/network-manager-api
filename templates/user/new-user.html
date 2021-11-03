@@ -1,0 +1,72 @@
+{% extends 'base.html' %}
+
+{% block header %}
+<style>
+    @media (min-width: 768px) {
+        .bd-placeholder-img-lg {
+            font-size: 3.5rem;
+        }
+    }
+</style>
+
+<!-- Hoja de estilo del login -->
+<link href="{{ url_for('static', filename='register.css') }}" rel="stylesheet">
+{% endblock %}
+
+{% block title %}Registro{% endblock %}
+
+{% block content %}
+
+<body class="text-center bg-dark">
+    <main class="form-signin bg-light rounded-3">
+        <form action="{{ url_for('new_user') }}" method="post">
+            <img class="mb-4" src="{{ url_for('static', filename='/icons/person-circle.svg') }}" alt="" width="72"
+                height="57">
+
+            <h1 class="h3 mb-3 fw-normal">Registro</h1>
+
+            <div class="form-floating pt-2 pb-2">
+                <input type="text" class="form-control bg-light" name="name" required>
+                <label>Nombre</label>
+            </div>
+            <div class="form-floating pt-2 pb-2">
+                <input type="text" class="form-control bg-light" name="last_name" required>
+                <label>Apellidos</label>
+            </div>
+            <div class="form-floating pt-2 pb-2">
+                <input type="email" class="form-control bg-light" name="email" required>
+                <label>Correo</label>
+            </div>
+            <div class="form-floating pt-2 pb-2">
+                <input type="text" class="form-control bg-light" name="user_name" required>
+                <label>Nombre de usuario</label>
+            </div>
+            <div class="form-floating pb-2 pb-2">
+                <input type="password" class="form-control bg-light" name="password" required>
+                <label>Contraseña</label>
+            </div>
+            <div class="form-floating pb-2 pb-2">
+                <select class="form-select" name="type">
+                    <option value="0">Estándar</option>
+                    <option value="1">Administrador</option>
+                </select>
+                <label>Tipo de cuenta</label>
+            </div>
+
+            <div class="mb-3">
+                <a class="btn btn-link link" href="{{url_for('menu')}}" role="button">Atras</a>
+            </div>
+
+            {% if msg %}
+            <div class="alert alert-info" role="alert">
+                <strong>{{msg}}</strong>
+            </div>
+            {% endif %}
+
+            <div class="d-grid gap-2 col-6 mx-auto">
+                <button class="w-100 btn btn-lg bg-btn" type="submit">Guardar</button>
+            </div>
+        </form>
+    </main>
+</body>
+{% endblock %}
