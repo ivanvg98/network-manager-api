@@ -1,7 +1,7 @@
 from typing import Protocol
 from flask import Flask, render_template, request, jsonify, redirect, session, url_for, make_response
 from Router_info import RouterInfo
-from Router_operations import get_router_interfaces, get_router_table, add_new_interfaces, delete_interfaces
+from Router_operations import get_router_interfaces, get_router_table, add_new_interfaces, delete_interfaces, rip_protocol, ospf_protocol, eigrp_protocol
 from flask_mysqldb import MySQL
 from datetime import timedelta
 import MySQLdb.cursors, time
@@ -480,31 +480,42 @@ def delete_device():
 
 
 #Recibe las redes y el protocolo a usar
-@app.route('/change/protocol', methods=['GET', 'POST'])
-def change_protocol():
+@app.route('/change/protocol/<router>', methods=['GET', 'POST'])
+def change_protocol(router):
     global protocols
+    response = verify_auth()
 
-    msg = "" 
-
-    if request.method == "POST":
-        protocol_data = request.get_json()
-
-        protocol = protocol_data['protocol']
-        networks = protocol_data['networks']
-
-        print(protocols[protocol])
-        print(networks)
-
-        for net in networks:
-            print(net)
-
-        msg = "SUCCESS"
+    if response['code'] == 401:
+        return make_response(jsonify(message=response['message']), response['code'])
     else:
-        msg = "FAIL"
+        selected_router = RouterInfo(router, response['user'], response['pass'])
+        if not device_exist(router):
+            return make_response(jsonify(message="Device does not exist"), 404)
+        else:
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute('SELECT * FROM Devices WHERE device_name = %s', [router])
+            mysql.connection.commit()
+            device = cursor.fetchone()
+            msg = ""
 
-    time.sleep(5)
+            if request.method == "POST":
+                protocol_data = request.get_json()
+                protocol = protocol_data['protocol']
+                networks = protocol_data['networks']
 
-    return jsonify({'msg': msg})
+                if protocol == "RIP":
+                    rip_protocol(selected_router.user, selected_router.password, device, networks)
+                elif protocol == "OSPF":
+                    process_id = protocol_data['process_id']
+                    ospf_protocol(selected_router.user, selected_router.password, device, networks, process_id)
+                elif protocol == "EIGRP":
+                    process_id = protocol_data['process_id']
+                    eigrp_protocol(selected_router.user, selected_router.password, device, networks, process_id)
+
+                msg = "SUCCESS"
+            else:
+                msg = "FAIL"
+            return jsonify({'msg': msg})
 
 
 # Obtiene una lista de interfaces del router
