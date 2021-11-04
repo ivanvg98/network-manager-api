@@ -1,9 +1,10 @@
 from typing import Protocol
-from flask import Flask, render_template, request, jsonify, redirect, session, url_for
+from flask import Flask, render_template, request, jsonify, redirect, session, url_for, make_response
+from Router_info import RouterInfo
+from Router_operations import get_router_interfaces, get_router_table, add_new_interfaces, delete_interfaces, rip_protocol, ospf_protocol, eigrp_protocol
 from flask_mysqldb import MySQL
 from datetime import timedelta
 import MySQLdb.cursors, time
-
 
 app = Flask(__name__)
 
@@ -20,7 +21,6 @@ app.config['SESSION_PERMANENT'] = False
 app.config['PERMANENT_SESSION_LIFETIME'] = timedelta(minutes=30)
 
 mysql = MySQL(app)
-
 
 protocols = {
     "0": "Ninguno",
@@ -68,6 +68,20 @@ def add_device(device_name, device_loop, routing_type):
         mysql.connection.commit()
 
         return True
+
+
+def verify_auth():
+    if request.authorization:
+        return {
+            'user': request.authorization.username,
+            'pass': request.authorization.password,
+            'code': 200
+        }
+    else:
+        return {
+            'message': 'Router authorization is required',
+            'code': 401
+        }
 
 
 # Ruta del formulario de login
@@ -465,29 +479,99 @@ def delete_device():
         return jsonify({'status': status, 'msg': msg})
 
 
-#Recibe las redes y el protocolo a usar
-@app.route('/change/protocol', methods=['GET', 'POST'])
-def change_protocol():
+# Recibe las redes y el protocolo a usar
+@app.route('/change/protocol/<router>', methods=['GET', 'POST'])
+def change_protocol(router):
     global protocols
+    response = verify_auth()
 
-    msg = "" 
-
-    if request.method == "POST":
-        protocol_data = request.get_json()
-
-        protocol = protocol_data['protocol']
-        networks = protocol_data['networks']
-
-        print(protocols[protocol])
-        print(networks)
-
-        for net in networks:
-            print(net)
-
-        msg = "SUCCESS"
+    if response['code'] == 401:
+        return make_response(jsonify(message=response['message']), response['code'])
     else:
-        msg = "FAIL"
+        selected_router = RouterInfo(router, response['user'], response['pass'])
+        if not device_exist(router):
+            return make_response(jsonify(message="Device does not exist"), 404)
+        else:
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute('SELECT * FROM Devices WHERE device_name = %s', [router])
+            mysql.connection.commit()
+            device = cursor.fetchone()
+            msg = ""
 
-    time.sleep(5)
+            if request.method == "POST":
+                protocol_data = request.get_json()
+                print(protocol_data)
+                protocol = protocol_data['protocol']
+                networks = protocol_data['networks']
 
-    return jsonify({'msg': msg})
+                if protocol == "RIP":
+                    rip_protocol(selected_router.user, selected_router.password, device, networks)
+                elif protocol == "OSPF":
+                    process_id = protocol_data['process_id']
+                    ospf_protocol(selected_router.user, selected_router.password, device, networks, process_id)
+                elif protocol == "EIGRP":
+                    process_id = protocol_data['process_id']
+                    eigrp_protocol(selected_router.user, selected_router.password, device, networks, process_id)
+
+                msg = "SUCCESS"
+            else:
+                msg = "FAIL"
+            return jsonify({'msg': msg})
+
+
+# Obtiene una lista de interfaces del router
+# Agrega una nueva interfaz al router
+# Elimina una interfaz del router
+@app.route('/interface/<router>', methods=['GET', 'POST'])
+def get_interfaces(router):
+    response = verify_auth()
+    if response['code'] == 401:
+        return make_response(jsonify(message=response['message']), response['code'])
+    else:
+        selected_router = RouterInfo(router, response['user'], response['pass'])
+        if not device_exist(router):
+            return make_response(jsonify(message="Device does not exist"), 404)
+        else:
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute('SELECT loopback FROM Devices WHERE device_name = %s', [router])
+            mysql.connection.commit()
+            device = cursor.fetchone()
+            if request.method == 'GET':
+                # GET
+                response = get_router_interfaces(selected_router.user, selected_router.password, device["loopback"])
+                return make_response(jsonify(message="Router interfaces", data=response), 200)
+            elif request.method == 'POST':
+                # POST
+                data = request.json
+                add_new_interfaces(selected_router.user, selected_router.password, device["loopback"], data)
+                return make_response(jsonify(message="Interfaces added"), 201)
+
+
+# Obtiene una lista de interfaces del router
+@app.route('/interface/route/<router>/', methods=['GET'])
+@app.route('/interface/route/<router>/<protocol>', methods=['GET'])
+def get_protocol_router(router, protocol=None):
+    response = verify_auth()
+    if response['code'] == 401:
+        return make_response(jsonify(message=response['message']), response['code'])
+    else:
+        selected_router = RouterInfo(router, response['user'], response['pass'])
+        if not device_exist(router):
+            return make_response(jsonify(message="Device does not exist"), 404)
+        else:
+            cursor = mysql.connection.cursor(MySQLdb.cursors.DictCursor)
+            cursor.execute('SELECT loopback FROM Devices WHERE device_name = %s', [router])
+            mysql.connection.commit()
+            device = cursor.fetchone()
+            response = get_router_table(selected_router.user, selected_router.password, device["loopback"])
+            if protocol is not None:
+                new_response = []
+                for element in response:
+                    if element["protocol"] == protocol:
+                        new_response = element
+                return make_response(jsonify(message="Router table", data=new_response), 200)
+            return make_response(jsonify(message="Router table", data=response), 200)
+
+
+if __name__ == '__main__':
+    app.run(host='127.0.0.1', debug=True)

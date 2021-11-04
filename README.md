@@ -2,11 +2,12 @@
 
 ## Dependencias
 
-Se requiere de flask y flask-mysqldb se instalan con:
+Se requiere de flask, flask-mysqldb y netmiko se instalan con:
 
 ```
 pip install flask
 pip install flask-mysqldb
+pip install netmiko
 ```
 
 ## Base de datos
