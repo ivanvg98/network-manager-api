@@ -479,7 +479,7 @@ def delete_device():
         return jsonify({'status': status, 'msg': msg})
 
 
-#Recibe las redes y el protocolo a usar
+# Recibe las redes y el protocolo a usar
 @app.route('/change/protocol/<router>', methods=['GET', 'POST'])
 def change_protocol(router):
     global protocols
@@ -500,6 +500,7 @@ def change_protocol(router):
 
             if request.method == "POST":
                 protocol_data = request.get_json()
+                print(protocol_data)
                 protocol = protocol_data['protocol']
                 networks = protocol_data['networks']
 
@@ -521,7 +522,7 @@ def change_protocol(router):
 # Obtiene una lista de interfaces del router
 # Agrega una nueva interfaz al router
 # Elimina una interfaz del router
-@app.route('/interface/<router>', methods=['GET', 'POST', 'DELETE'])
+@app.route('/interface/<router>', methods=['GET', 'POST'])
 def get_interfaces(router):
     response = verify_auth()
     if response['code'] == 401:
@@ -544,11 +545,6 @@ def get_interfaces(router):
                 data = request.json
                 add_new_interfaces(selected_router.user, selected_router.password, device["loopback"], data)
                 return make_response(jsonify(message="Interfaces added"), 201)
-            elif request.method == 'DELETE':
-                # DELETE
-                data = request.json
-                delete_interfaces(selected_router.user, selected_router.password, device["loopback"], data)
-                return make_response(jsonify(message="Interfaces added"), 202)
 
 
 # Obtiene una lista de interfaces del router
